@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+	<constant name="struts.action.extension" value="action,do,,"></constant>
+	<constant name="struts.enable.DynamicMethodInvocation" value="true" />
+	<constant name="struts.ognl.allowStaticMethodAccess" value="true"></constant>
+    <constant name="struts.devMode" value="true" />
+    <constant name="struts.ui.theme" value="simple" />
+    
+	
+	<package name="default" namespace="/" extends="json-default">
+		<interceptors>
+			<interceptor-stack name="newDefaultStack">
+				<interceptor-ref name="defaultStack">
+					<param name="chain.copyErrors">true</param>
+					<param name="chain.copyFieldErrors">true</param>
+<!-- 					<param name="fileUpload.allowedTypes">application/vnd.ms-excel</param> -->
+					<param name="fileUpload.allowedExtensions">.xls</param>
+					<param name="modelDriven.refreshModelBeforeResult">true</param>
+				</interceptor-ref>
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="newDefaultStack" />
+		
+		<global-results>
+			<result name="ajax-success" type="stream">
+				<param name="contentType">text/html</param>
+				<param name="inputName">inputStream</param>
+			</result>
+		</global-results>
+		<action name="emp_upload" class="employeeAction" method="upload">
+																																																																																																																																																																																																																																																																																																																													<result name="upload">WEB-INF/views/success.jsp</result>
+			<result name="input">WEB-INF/views/emps/emp-upload.jsp</result>
+		</action>
+		
+		<action name="emp_save" class="employeeAction" method="save">
+			<result name="input" type="chain">emp_toAddUI</result>
+			<result name="save">WEB-INF/views/success.jsp</result>
+		</action>
+		<action name="emp_toUpload" class="employeeAction">
+			<result>WEB-INF/views/emps/emp-upload.jsp</result>
+		</action>
+	
+		<action name="emp_*" class="employeeAction" method="{1}">
+			<!-- 登录时的异常映射 -->
+			<exception-mapping result="input"
+				exception="com.atguigu.ems.exception.LoginNameNotExistException"/>
+			<exception-mapping result="input"
+				exception="com.atguigu.ems.exception.LoginNamePwdNotMatchException"/>
+			<!-- 登录成功的响应 -->
+			<result>WEB-INF/views/login-success.jsp</result>
+			<!-- xml验证出错的响应页面 -->
+			<result name="input">WEB-INF/views/login.jsp</result>
+			<result name="toAddUI">WEB-INF/views/emps/emp-input.jsp</result>
+			<result name="list">WEB-INF/views/emps/emp-list.jsp</result>
+		
+			<!-- 文件下载 -->
+			<result name="downToExcel" type="stream">
+				<param name="bufferSize">2048</param>
+				<param name="allowcaching">true</param>
+			</result>
+			
+			<!-- Ajax,返回json数据 -->
+			<result name="navigate" type="json">
+				<param name="root">navigations</param>
+			</result>
+		</action>
+    </package>
+    
+    <include file="com/atguigu/ems/struts/action/struts-role.xml"></include>
+    
+</struts>
